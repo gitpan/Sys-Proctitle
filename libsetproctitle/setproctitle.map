@@ -1,0 +1,6 @@
+{
+  global: setproctitle;
+  	  setproctitle_max;
+	  getproctitle;
+  local: *;
+};

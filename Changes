@@ -1,0 +1,9 @@
+Revision history for Perl extension Sys::Proctitle.
+
+0.01  Fri Nov 19 21:42:32 2004
+	- original version
+
+0.02  Thu Dec 30 11:58:28 CET 2004
+	- 1st publicly available version
+	- OO interface
+
