@@ -3,7 +3,6 @@ package Sys::Proctitle;
 use 5.008;
 use strict;
 use warnings;
-use Class::Member::HASH qw/_old/;
 
 require Exporter;
 
@@ -14,7 +13,7 @@ our %EXPORT_TAGS=(
 our @EXPORT_OK=(@{ $EXPORT_TAGS{'all'}});
 our @EXPORT=();
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 our $setproctitle_so=$INC{'Sys/Proctitle.pm'};
 $setproctitle_so=~s!/Sys/Proctitle\.pm$!/auto/Sys/Proctitle/setproctitle.so!
   unless( $setproctitle_so=~s!blib/lib/Sys/Proctitle\.pm$!blib/arch/auto/Sys/Proctitle/setproctitle.so! and
@@ -28,9 +27,9 @@ sub setproctitle;
 
 sub new {
   my $class=ref($_[0]) || $_[0];
-  my $I=bless {}=>$class;
+  my $I=bless do{\my $dummy}=>$class;
 
-  $I->_old=getproctitle;
+  $$I=getproctitle;
   setproctitle( @_[1..$#_] );
 
   return $I;
@@ -38,7 +37,7 @@ sub new {
 
 sub DESTROY {
   my $I=shift;
-  setproctitle( $I->_old ) if( length $I->_old );
+  setproctitle( $$I ) if( length $$I );
 }
 
 1;

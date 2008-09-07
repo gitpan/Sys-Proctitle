@@ -1,7 +1,7 @@
 Changes
 Makefile.PL
 MANIFEST
-ppport.h
+perl-Sys-Proctitle.spec
 Proctitle.xs
 README
 t/Sys-Proctitle.t

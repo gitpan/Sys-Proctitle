@@ -2,7 +2,6 @@
 #include "perl.h"
 #include "XSUB.h"
 
-#include "ppport.h"
 #include "dlfcn.h"
 
 static int (*setproctitle)(const char *buf, int len);

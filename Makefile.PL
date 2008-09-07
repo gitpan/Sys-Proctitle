@@ -6,7 +6,6 @@ WriteMakefile(
     NAME              => 'Sys::Proctitle',
     VERSION_FROM      => 'lib/Sys/Proctitle.pm', # finds $VERSION
     PREREQ_PM         => {
-			  "Class::Member" => '1.3',
 			 },
     ($] >= 5.005 ?     ## Add these new keywords supported since 5.005
       (ABSTRACT_FROM  => 'lib/Sys/Proctitle.pm', # retrieve abstract from module
@@ -36,5 +35,11 @@ setproctitle:
 
 README: lib/Sys/Proctitle.pm mk_README.sh
 	./mk_README.sh
+
+COMPRESS = gzip -9f
+
+rpm: dist
+	$(PERL) -i -pe 's/^(Version:\s*).*/$${1}$(VERSION)/' perl-Sys-Proctitle.spec
+	rpmbuild -ba perl-Sys-Proctitle.spec
 EOF
 }

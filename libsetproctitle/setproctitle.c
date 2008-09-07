@@ -84,7 +84,7 @@ getproctitle( char *buf, int len )
 /* all that space can be used to set the proctitle. Overwriting it */
 /* changes a process' /proc/self/cmdline and /proc/self/environ. */
 
-/* the argv and envp pointer arrays are also laid out consequtively: */
+/* the argv and envp pointer arrays are also laid out consecutively: */
 /*                  +-----------------------+ |    */
 /*     argv[0]      | pointer to 1lahblah\0 | | h  */
 /*                  +-----------------------+ | i  */
