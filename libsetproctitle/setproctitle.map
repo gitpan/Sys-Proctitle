@@ -2,5 +2,6 @@
   global: setproctitle;
   	  setproctitle_max;
 	  getproctitle;
+	  proctitle_kernel_support;
   local: *;
 };

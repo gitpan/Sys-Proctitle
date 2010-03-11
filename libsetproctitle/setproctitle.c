@@ -4,6 +4,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <stdarg.h>
+#include <sys/prctl.h>
 
 #include "setproctitle.h"
 
@@ -17,6 +18,19 @@ extern char **environ;
 static char *title_buffer=0;
 static size_t title_buffer_size=0;
 static char *saved_argv=0;
+# if defined(PR_SET_NAME) && defined(PR_GET_NAME)
+static char saved_kernel_name[16];
+# endif
+
+int
+proctitle_kernel_support( void )
+{
+# if defined(PR_SET_NAME) && defined(PR_GET_NAME)
+  return 1;
+# else
+  return 0;
+# endif
+}
 
 int
 setproctitle_max( void )
@@ -34,13 +48,17 @@ setproctitle( const char *buf, int len )
 
   if( buf ) {
     len=len<title_buffer_size?len:title_buffer_size-1;
+    memcpy( title_buffer, buf, len );
+    memset( title_buffer+len, 0, title_buffer_size-len );
+#   if defined(PR_SET_NAME) && defined(PR_GET_NAME)
+      prctl(PR_SET_NAME, (unsigned long)title_buffer, 0, 0, 0);
+#   endif
   } else {
-    len=title_buffer_size;
-    buf=saved_argv;
+    memcpy( title_buffer, saved_argv, title_buffer_size );
+#   if defined(PR_SET_NAME) && defined(PR_GET_NAME)
+      prctl(PR_SET_NAME, (unsigned long)saved_kernel_name, 0, 0, 0);
+#   endif
   }
-
-  memcpy( title_buffer, buf, len );
-  memset( title_buffer+len, 0, title_buffer_size-len );
 
   return 0;
 }
@@ -186,6 +204,10 @@ _init( int argc, char *argv[], char *envp[] )
 
   title_buffer=bob;
   title_buffer_size=eob-bob;
+
+# if defined(PR_SET_NAME) && defined(PR_GET_NAME)
+  prctl(PR_GET_NAME, (unsigned long)saved_kernel_name, 0, 0, 0);
+# endif
 
 # if DEBUG==1
   fprintf( stderr, "_init: finished\n" );

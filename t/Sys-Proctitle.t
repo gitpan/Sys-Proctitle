@@ -11,41 +11,64 @@ sub cmdline {
   my $rc=<$f>;
   $rc=~s/\0+$//;
   $rc=~s/\0/ /g;
-  print "# /proc/$$/cmdline='$rc'\n";
   return $rc;
 }
 
-use Test::More tests => 9;
+sub procname {
+  local $/="\n";
+  open my $f, "/proc/$$/status";
+  while( defined(my $l=readline $f) ) {
+    return $1 if $l=~/^Name:\s*(.*)/;
+  }
+  return
+}
+
+use Test::More tests => 12;
 BEGIN { use_ok('Sys::Proctitle') };
 
-my $orig=cmdline;
+my $origcmdline=cmdline;
+my $origprocname=procname;
 
 Sys::Proctitle::setproctitle("klaus\0otto");
-ok cmdline eq 'klaus otto', 'set';
+cmp_ok cmdline, 'eq', 'klaus otto', 'set (cmdline)';
+SKIP: {
+  skip "kernel too old for prctl(PR_SET_NAME)", 1
+    unless Sys::Proctitle::kernel_support;
+  cmp_ok procname, 'eq', 'klaus', 'set (procname)';
+}
 
 Sys::Proctitle::setproctitle;
-ok cmdline eq $orig, 'unset';
+cmp_ok cmdline, 'eq', $origcmdline, 'unset (cmdline)';
+SKIP: {
+  skip "kernel too old for prctl(PR_SET_NAME)", 1
+    unless Sys::Proctitle::kernel_support;
+  cmp_ok procname, 'eq', $origprocname, 'unset (procname)';
+}
 
 Sys::Proctitle::setproctitle("klaus", "otto");
-ok cmdline eq 'klaus otto', 'list';
+cmp_ok cmdline, 'eq', 'klaus otto', 'list';
+SKIP: {
+  skip "kernel too old for prctl(PR_SET_NAME)", 1
+    unless Sys::Proctitle::kernel_support;
+  cmp_ok procname, 'eq', 'klaus', 'set/list (procname)';
+}
 
 my $rc=Sys::Proctitle::getproctitle;
 my $xrc=$rc; $xrc=~s/\0/!/g;
-print "# rc='$xrc' (\\0 was replaced by !)\n";
-ok $rc=~/klaus\0otto\0+$/, 'get';
+like $rc, qr/klaus\0otto\0+$/, 'get';
 
 Sys::Proctitle::setproctitle;
-ok cmdline eq $orig, 'unset again';
+cmp_ok cmdline, 'eq', $origcmdline, 'unset again';
 
 Sys::Proctitle::setproctitle($rc);
-ok cmdline eq 'klaus otto', 'value got via getproctitle() restored';
+cmp_ok cmdline, 'eq', 'klaus otto', 'value got via getproctitle() restored';
 
 {
   my $proctitle=Sys::Proctitle->new( qw/object interface/ );
-  ok cmdline eq 'object interface', 'object interface';
+  cmp_ok cmdline, 'eq', 'object interface', 'object interface';
 }
 
-ok cmdline eq 'klaus otto', 'object destroyed';
+cmp_ok cmdline, 'eq', 'klaus otto', 'object destroyed';
 
 ## Local Variables: ##
 ## mode: cperl ##

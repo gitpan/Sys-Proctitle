@@ -7,6 +7,7 @@
 static int (*setproctitle)(const char *buf, int len);
 static int (*getproctitle)(char *buf, int len);
 static int (*setproctitle_max)(void);
+static int (*proctitle_kernel_support)(void);
 
 MODULE = Sys::Proctitle		PACKAGE = Sys::Proctitle		
 
@@ -18,7 +19,7 @@ getproctitle()
       int len=setproctitle_max();
       char *buf=malloc( len );
       if( getproctitle( buf, len ) ) {
-	XSRETURN_UNDEF;
+	XSRETURN_EMPTY;
       } else {
 	RETVAL=newSVpv( buf, len );
       }
@@ -62,6 +63,16 @@ setproctitle(...)
     }
     XSRETURN_YES;
 
+SV *
+kernel_support()
+  PROTOTYPE:
+  CODE:
+    {
+      proctitle_kernel_support() ? XSRETURN_YES : XSRETURN_EMPTY;
+    }
+  OUTPUT:
+    RETVAL
+
 BOOT:
   {
     STRLEN len;
@@ -87,6 +98,11 @@ BOOT:
     if( (error=dlerror())!=NULL ) {
       dlclose( h );
       croak( "%s was not found in %s", "setproctitle_max", lib );
+    }
+    proctitle_kernel_support=dlsym( h, "proctitle_kernel_support" );
+    if( (error=dlerror())!=NULL ) {
+      dlclose( h );
+      croak( "%s was not found in %s", "proctitle_kernel_support", lib );
     }
   }
 

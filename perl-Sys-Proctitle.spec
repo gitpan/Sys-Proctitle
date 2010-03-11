@@ -6,7 +6,7 @@ Obsoletes:    p_Sys_Proctitle
 Requires:     perl = %{perl_version}
 Autoreqprov:  on
 Summary:      Sys::Proctitle
-Version:      0
+Version:      0.04
 Release:      1
 Source:       Sys-Proctitle-%{version}.tar.gz
 BuildRoot:    %{_tmppath}/%{name}-%{version}-build

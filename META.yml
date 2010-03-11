@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:                Sys-Proctitle
-version:             0.03
+version:             0.04
 abstract:            modify proctitle on Linux
 license:             ~
 author:              

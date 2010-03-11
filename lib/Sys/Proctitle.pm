@@ -13,7 +13,7 @@ our %EXPORT_TAGS=(
 our @EXPORT_OK=(@{ $EXPORT_TAGS{'all'}});
 our @EXPORT=();
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 our $setproctitle_so=$INC{'Sys/Proctitle.pm'};
 $setproctitle_so=~s!/Sys/Proctitle\.pm$!/auto/Sys/Proctitle/setproctitle.so!
   unless( $setproctitle_so=~s!blib/lib/Sys/Proctitle\.pm$!blib/arch/auto/Sys/Proctitle/setproctitle.so! and
@@ -36,7 +36,7 @@ sub new {
 }
 
 sub DESTROY {
-  my $I=shift;
+  my ($I)=@_;
   setproctitle( $$I ) if( length $$I );
 }
 

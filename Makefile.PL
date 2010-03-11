@@ -1,4 +1,8 @@
 use 5.008;
+
+# prevent automatic testing on non-linux systems
+BEGIN {$^O eq 'linux' or exit 0;}
+
 use ExtUtils::MakeMaker;
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence
 # the contents of the Makefile that is written.
